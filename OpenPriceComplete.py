@@ -5,11 +5,12 @@ import math
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
+from keras.layers import Dropout
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 %matplotlib inline
 
-look_back = 1
+look_back = 5
 #look back how many days
 scaler = MinMaxScaler(feature_range=(0, 1))
 
@@ -42,8 +43,13 @@ testX = numpy.reshape(testX, (testX.shape[0], 1, testX.shape[1]))
 
 #create and fit the LSTM network
 model = Sequential()
-model.add(LSTM(4, input_shape=(1, look_back)))
-model.add(Dense(1))
+model.add(LSTM(units = 50, return_sequences = True, input_shape = (1,look_back)))
+model.add(Dropout(0.5))
+model.add(LSTM(units = 50))
+model.add(Dropout(0.5))
+
+model.add(Dense(units = 1))
+
 model.compile(loss='mean_squared_error',optimizer = 'adam')
 model.fit(trainX, trainY, epochs=100, batch_size=1, verbose=2)
 
