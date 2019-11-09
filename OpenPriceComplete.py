@@ -1,14 +1,13 @@
 import numpy
-import matplotlib.pyplot as plt 
+##import matplotlib.pyplot as plt 
 from pandas import read_csv
 import math
-from keras.models import Sequential
+from keras.models import Sequential, save_model, load_model
 from keras.layers import Dense
 from keras.layers import LSTM
 from keras.layers import Dropout
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
-%matplotlib inline
 
 look_back = 5
 #look back how many days
@@ -52,7 +51,9 @@ model.add(Dense(units = 1))
 
 model.compile(loss='mean_squared_error',optimizer = 'adam')
 model.fit(trainX, trainY, epochs=100, batch_size=1, verbose=2)
+model.save('lstm.hdf5')
 
+model = load_model('lstm.hdf5')
 #make the prediction
 trainPredict = model.predict(trainX)
 testPredict =  model.predict(testX)
@@ -84,6 +85,7 @@ trainScore = math.sqrt(mean_squared_error(trainY[0], trainPredict[:,0]))
 print('Train Score: %.2f RMSE' % (trainScore))
 testScore = math.sqrt(mean_squared_error(testY[0], testPredict[:,0]))
 print('Test Score: %.2f RMSE' % (testScore))
+'''
 plt.plot(scaler.inverse_transform(dataset_test), color = 'green', label = 'Google Stock Price Test')
 plt.plot(testPredict, color = 'purple', label = 'Predicted Test Google Stock Price')
 plt.plot(scaler.inverse_transform(dataset_train), color = 'red', label = 'Google Stock Price Train')
@@ -91,4 +93,4 @@ plt.plot(trainPredict, color = 'blue', label = 'Predicted Train Google Stock Pri
 plt.legend()
 plt.show()
 
-
+'''
