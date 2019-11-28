@@ -1,17 +1,54 @@
+'''
 import numpy as np
 import matplotlib.pyplot as plt 
-import pandas as pd
-#this library is for normalize
 from sklearn.preprocessing import MinMaxScaler
-#this keras library is for build module LSTM
-#LSTM is for time sequential
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, Dropout
+'''
+import pandas as pd
+import json
+import glob
 
+##filenames = glob.glob("json/*.json")
 
-dataset_train = pd.read_csv('Google_Stock_Price_Train.csv') # load data
-training_set = dataset_train.iloc[:, 1:2].values
+'''
+for filename in filenames:
+    df = pd.read_json(filename)
+    li.append(df)
+    number+=1
+    print(number)
 
+frame = pd.concat(li, axis=0, ignore_index=True)
+print(frame)
+'''
+li = []
+number = 0
+filenames = glob.glob("json/*.json")
+for filename in filenames:
+    df = pd.read_json(filename)
+    df = pd.DataFrame(df,index=["0050"], columns = ["high"])
+    li.append(df)
+    number+=1
+    print(number)
+
+print(li)
+"""
+file1 = pd.read_json("json/2004-02-11.json",orient = 'index')
+print(file1)
+df=df1=pd.DataFrame(file1, index=["0050"], columns = ["high"])
+print(df1)
+
+file2 = pd.read_json("json/2004-02-12.json",orient = 'index')
+##print(file2)
+index=["adj_close"]
+
+df2=pd.DataFrame(file2, index=["0050"], columns = ["high"])
+print(df2)
+li=df.append(df2, ignore_index = True)
+print(li)
+"""
+
+'''
 #here to normalize the scaling
 sc = MinMaxScaler(feature_range  =(0, 1))
 training_set_scaled = sc.fit_transform(training_set)
@@ -80,3 +117,4 @@ plt.ylabel('Google Stock Price')
 plt.legend()
 plt.show()
 
+'''
