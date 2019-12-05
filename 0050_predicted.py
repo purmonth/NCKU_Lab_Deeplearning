@@ -15,6 +15,9 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 numpy.random.seed(0)
 
 look_back = 5
+
+Total = 1000000
+
 #look back how many days
 scaler = MinMaxScaler(feature_range=(0, 1))
 
@@ -84,20 +87,22 @@ trainPredict = scaler.inverse_transform(trainPredict)
 trainY = scaler.inverse_transform([trainY])
 testPredict = scaler.inverse_transform(testPredict)
 testY = scaler.inverse_transform([testY])
-print("Raw_dataset_train")
+print("\nRaw_dataset_train")
 print(Raw_dataset_train)
-print("Raw_dataset_test")
+print("\nRaw_dataset_test")
 print(Raw_dataset_test)
-print("trainX & trainY")
-print(trainX)
-print(trainY)
-print("testX & testY")
-print(testX)
-print(testY)
-print("trainPredict")
-print(trainPredict)
-print("testPredict")
-print(testPredict)
+print("\ntrainX")
+print(trainX.shape)
+print("\ntrainY")
+print(trainY.shape)
+print("\ntestX")
+print(testX.shape)
+print("\ntestY")
+print(testY.shape)
+print("\ntrainPredict")
+print(trainPredict.shape)
+print("\ntestPredict")
+print(testPredict.shape)
 
 
 # calculate root mean squared error
