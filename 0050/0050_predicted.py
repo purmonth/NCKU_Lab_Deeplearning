@@ -15,9 +15,8 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 numpy.random.seed(0)
 
 look_back = 5
-index = 0
-Original = 1000000
-Total = 1000000
+Total = int(input("Please input the number you can invest: "))
+Original = Total
 sum = 0
 
 #look back how many days
@@ -30,6 +29,15 @@ def create_dataset(dataset, look_back=1):
 		dataX.append(a)
 		dataY.append(dataset[i + look_back, 0])
 	return numpy.array(dataX), numpy.array(dataY)
+
+def ratio(a,b):
+	if(a>0 and b > 0):
+	  	return 1
+	if(a<0 and b < 0):
+		return 1
+	else:
+		return 0
+
 
 dataset_train = read_csv('0050_2004_open-nodate.csv',usecols=[0],engine='python')
 Raw_dataset_train = dataset_train.values
@@ -62,14 +70,14 @@ model.compile(loss='mean_squared_error',optimizer = 'adam')
 log_dir="logs/fit" 
 
 # Set callback functions to early stop training and save the best model so far
-callbacks = [EarlyStopping(monitor='val_loss', patience=5),
+callbacks = [##EarlyStopping(monitor='val_loss', patience=5),
              ModelCheckpoint(filepath='best_model.h5', monitor='val_loss', save_best_only=True),
 			 TensorBoard(log_dir=log_dir)
 			 ]
 
 model.fit(	trainX,
 			trainY, 
-			epochs=100,
+			epochs=200,
 			batch_size=100, 
 			verbose=2,
 			validation_data=(testX, testY),
@@ -122,13 +130,15 @@ for i, element in enumerate(testPredict):
 	print(i,element)
 print("*******")
 
-
+RightRatio = 0
 
 for i in range(len(testPredict)):
 	difference = (testPredict[i][0]-Raw_dataset_test[i+5][0])
+	##如果 明天預測-今天 跟 明天實際-今天 的正負號一樣
+	##print(ratio(testPredict[i][0]-Raw_dataset_test[i+5][0],Raw_dataset_test[i+6][0]-Raw_dataset_test[i+5][0]))
+	RightRatio += ratio(testPredict[i][0]-Raw_dataset_test[i+5][0],Raw_dataset_test[i+6][0]-Raw_dataset_test[i+5][0])
 	print(difference)
-	print("The correct ratio:",testPredict[i]-Raw_dataset_test[i+6]/Raw_dataset_test,"\n")
-	##如果開盤價小於預測 買股票大於則賣
+	##如果開盤價小於預測買股票  大於則賣
 	##buy
 	if(difference < 0):
 		if(Total >= 1000*Raw_dataset_test[i+5][0]):
@@ -142,17 +152,16 @@ for i in range(len(testPredict)):
 			print(Total)
 			sum -= 1
 
-
-print("\n",sum,"\n")
+RightRatio /= len(testPredict)
+print("\nThis is Right Ratio: ", round(RightRatio,2))
 
 if(i == len(testPredict)-1):
 	if(sum > 0):
 		Total += 1000*(Raw_dataset_test[i+5][0] * (sum))
 		sum = 0
-
-print("\n",sum,"\n")
-print("\nWe earn",Total-Original,"\n")
-print("\nThis is ",round(100*(Total-Original)/Original,2),"%")
+print("If we invest ",Original)
+print("We earn",Total-Original)
+print("This is ",round(100*(Total-Original)/Original,2),"%")
 ##如果開盤價連續小於收盤價 	賣股票
 ##如果開盤價連續大於收盤價	買股票
 
