@@ -15,7 +15,8 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 numpy.random.seed(0)
 
 look_back = 5
-
+index = 0
+Original = 1000000
 Total = 1000000
 sum = 0
 
@@ -30,7 +31,7 @@ def create_dataset(dataset, look_back=1):
 		dataY.append(dataset[i + look_back, 0])
 	return numpy.array(dataX), numpy.array(dataY)
 
-dataset_train = read_csv('0050_2004_open.csv',usecols=[0],engine='python')
+dataset_train = read_csv('0050_2004_open-nodate.csv',usecols=[0],engine='python')
 Raw_dataset_train = dataset_train.values
 dataset_train = Raw_dataset_train.astype('float32')
 dataset_train = scaler.fit_transform(dataset_train)
@@ -41,7 +42,7 @@ trainX, trainY = create_dataset(dataset_train, look_back)
 trainX = numpy.reshape(trainX, (trainX.shape[0], 1, trainX.shape[1]))
 
 
-dataset_test = read_csv('0050_2019_open.csv',usecols=[0],engine='python')
+dataset_test = read_csv('0050_2019_open-nodate.csv',usecols=[0],engine='python')
 Raw_dataset_test = dataset_test.values
 dataset_test = Raw_dataset_test.astype('float32')
 dataset_test = scaler.fit_transform(dataset_test)
@@ -88,6 +89,7 @@ trainPredict = scaler.inverse_transform(trainPredict)
 trainY = scaler.inverse_transform([trainY])
 testPredict = scaler.inverse_transform(testPredict)
 testY = scaler.inverse_transform([testY])
+'''
 print("\nRaw_dataset_train")
 print(Raw_dataset_train)
 print("\nRaw_dataset_test")
@@ -110,6 +112,7 @@ print(trainPredict)
 print("\ntestPredict")
 print(testPredict.shape)
 print(testPredict)
+'''
 ##預測五天後的開盤價
 
 print("*******")
@@ -119,21 +122,37 @@ for i, element in enumerate(testPredict):
 	print(i,element)
 print("*******")
 
+
+
 for i in range(len(testPredict)):
-	price = (testPredict[i][0]-Raw_dataset_test[i+5][0])
-	print(price)
-	if(price<0):
-		sum+= -price
-	if(price>0):
-		sum += price
+	difference = (testPredict[i][0]-Raw_dataset_test[i+5][0])
+	print(difference)
+	print("The correct ratio:",testPredict[i]-Raw_dataset_test[i+6]/Raw_dataset_test,"\n")
 	##如果開盤價小於預測 買股票大於則賣
-	if(price < 0):
-		Total = Total - Raw_dataset_test[i+5][0]
-	if(price > 0):
-		Total = Total + Raw_dataset_test[i+5][0]
-sum *= 1000
+	##buy
+	if(difference < 0):
+		if(Total >= 1000*Raw_dataset_test[i+5][0]):
+			Total -=  1000*Raw_dataset_test[i+5][0]
+			print(Total)
+			sum += 1
+	##sold
+	if(difference > 0):
+		if(sum > 0):
+			Total += 1000*Raw_dataset_test[i+5][0]
+			print(Total)
+			sum -= 1
+
+
 print("\n",sum,"\n")
-print("\n",Total,"\n")
+
+if(i == len(testPredict)-1):
+	if(sum > 0):
+		Total += 1000*(Raw_dataset_test[i+5][0] * (sum))
+		sum = 0
+
+print("\n",sum,"\n")
+print("\nWe earn",Total-Original,"\n")
+print("\nThis is ",round(100*(Total-Original)/Original,2),"%")
 ##如果開盤價連續小於收盤價 	賣股票
 ##如果開盤價連續大於收盤價	買股票
 
