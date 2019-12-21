@@ -1,7 +1,7 @@
 import numpy 
 import tensorflow as tf
 import datetime
-##import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 from pandas import read_csv
 import math
 from keras.models import Sequential, save_model, load_model
@@ -143,7 +143,6 @@ print('Train Score: %.2f RMSE' % (trainScore))
 testScore = math.sqrt(mean_squared_error(testY[0], testPredict[:,0]))
 print('Test Score: %.2f RMSE' % (testScore))
 
-'''
 plt.plot(scaler.inverse_transform(dataset_test), color = 'green', label = 'Google Stock Price Test')
 plt.plot(testPredict, color = 'purple', label = 'Predicted Test Google Stock Price')
 plt.plot(scaler.inverse_transform(dataset_train), color = 'red', label = 'Google Stock Price Train')
@@ -151,4 +150,4 @@ plt.plot(trainPredict, color = 'blue', label = 'Predicted Train Google Stock Pri
 plt.legend()
 plt.show()
 
-'''
+
