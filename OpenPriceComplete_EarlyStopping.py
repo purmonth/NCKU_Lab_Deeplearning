@@ -4,13 +4,13 @@ import datetime
 ##import matplotlib.pyplot as plt 
 from pandas import read_csv
 import math
-from keras.models import Sequential, save_model, load_model
-from keras.layers import Dense
-from keras.layers import LSTM
-from keras.layers import Dropout
+from tensorflow.keras.models import Sequential, save_model, load_model
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import LSTM
+from tensorflow.keras.layers import Dropout
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
-from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 
 numpy.random.seed(0)
 

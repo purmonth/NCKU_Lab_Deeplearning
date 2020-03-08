@@ -4,17 +4,17 @@ import datetime
 import matplotlib.pyplot as plt
 from pandas import read_csv
 import math
-from keras.models import Sequential, save_model, load_model
-from keras.layers import Dense
-from keras.layers import LSTM
-from keras.layers import Dropout
+from tensorflow.keras.models import Sequential, save_model, load_model
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import LSTM
+from tensorflow.keras.layers import Dropout
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
-from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 
 numpy.random.seed(0)
 
-look_back = 5
+look_back = 3
 Total = int(input("Please input the number you can invest: "))
 Original = Total
 sum = 0
@@ -39,7 +39,7 @@ def ratio(a,b):
 		return 0
 
 
-dataset_train = read_csv('0050_2004_high-nodate.csv',usecols=[0],engine='python')
+dataset_train = read_csv('0050_2004_close-date.csv',usecols=[0],engine='python')
 Raw_dataset_train = dataset_train.values
 dataset_train = Raw_dataset_train.astype('float32')
 dataset_train = scaler.fit_transform(dataset_train)
@@ -50,7 +50,7 @@ trainX, trainY = create_dataset(dataset_train, look_back)
 trainX = numpy.reshape(trainX, (trainX.shape[0], 1, trainX.shape[1]))
 
 
-dataset_test = read_csv('0050_2019_high-nodate.csv',usecols=[0],engine='python')
+dataset_test = read_csv('0050_2019_close-date.csv',usecols=[0],engine='python')
 Raw_dataset_test = dataset_test.values
 dataset_test = Raw_dataset_test.astype('float32')
 dataset_test = scaler.fit_transform(dataset_test)
@@ -133,22 +133,22 @@ print("*******")
 RightRatio = 0
 
 for i in range(len(testPredict)):
-	difference = (testPredict[i][0]-Raw_dataset_test[i+5][0])
+	difference = (testPredict[i][0]-Raw_dataset_test[i+look_back][0])
 	##如果 明天預測-今天 跟 明天實際-今天 的正負號一樣
 	##print(ratio(testPredict[i][0]-Raw_dataset_test[i+5][0],Raw_dataset_test[i+6][0]-Raw_dataset_test[i+5][0]))
-	RightRatio += ratio(testPredict[i][0]-Raw_dataset_test[i+5][0],Raw_dataset_test[i+6][0]-Raw_dataset_test[i+5][0])
+	RightRatio += ratio(testPredict[i][0]-Raw_dataset_test[i+look_back][0],Raw_dataset_test[i+look_back+1][0]-Raw_dataset_test[i+look_back][0])
 	print(difference)
 	##如果開盤價小於預測買股票  大於則賣
 	##buy
 	if(difference < 0):
-		if(Total >= 1000*Raw_dataset_test[i+5][0]):
-			Total -=  1000*Raw_dataset_test[i+5][0]
+		if(Total >= 1000*Raw_dataset_test[i+look_back][0]):
+			Total -=  1000*Raw_dataset_test[i+look_back][0]
 			print(Total)
 			sum += 1
 	##sold
 	if(difference > 0):
 		if(sum > 0):
-			Total += 1000*Raw_dataset_test[i+5][0]
+			Total += 1000*Raw_dataset_test[i+look_back][0]
 			print(Total)
 			sum -= 1
 
@@ -157,7 +157,7 @@ print("\nThis is Right Ratio: ", round(RightRatio,2))
 
 if(i == len(testPredict)-1):
 	if(sum > 0):
-		Total += 1000*(Raw_dataset_test[i+5][0] * (sum))
+		Total += 1000*(Raw_dataset_test[i+look_back][0] * (sum))
 		sum = 0
 print("If we invest ",Original)
 print("We earn",Total-Original)

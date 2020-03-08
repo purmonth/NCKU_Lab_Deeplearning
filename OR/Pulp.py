@@ -1,6 +1,5 @@
 import numpy as np
 import pulp
-##from coinor.pulp import *
 
 
 myList = ['apple', 'orange', 'banana'] 
