@@ -11,7 +11,7 @@ from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoa
 
 numpy.random.seed(0)
 look_back = 5
-Total = int(input("Please input the number you can invest: "))
+Total = 1000000
 Original = Total
 sum = 0
 
@@ -32,7 +32,7 @@ def createY_dataset(dataset, look_back):
     for i in range(len(dataset)-look_back-1):
         #0~5:"adj_close","close","high","low","open","volume"
         a = dataset[i:(i+look_back),0]
-        dataY.append(dataset[i + look_back,0])
+        dataY.append(dataset[i + look_back,3])
     return numpy.array(dataY)
 
 
@@ -64,6 +64,7 @@ trainX = createX_dataset(dataset_train, look_back)
 trainY = createY_dataset(dataset_train, look_back)
 maxvalue =  48.30 / trainY[0]
 print(maxvalue)
+print(trainＹ.shape)
 print(trainX.shape)
 trainX = numpy.reshape(trainX, (trainX.shape[0], look_back, trainX.shape[2]))
 print(trainX.shape)
@@ -120,14 +121,16 @@ trainPredict *= maxvalue
 testPredict *= maxvalue
 
 
-
-RightRatio = 0
+DifRightRatio = 0
+BSRightRatio = 0
 
 for i in range(len(testPredict)):
 	difference = (testPredict[i][0]-Raw_dataset_test[i+look_back][0])
 	##如果 明天預測-今天 跟 明天實際-今天 的正負號一樣
 	##print(ratio(testPredict[i][0]-Raw_dataset_test[i+5][0],Raw_dataset_test[i+6][0]-Raw_dataset_test[i+5][0]))
-	RightRatio += ratio(testPredict[i][0]-Raw_dataset_test[i+look_back][0],Raw_dataset_test[i+look_back+1][0]-Raw_dataset_test[i+look_back][0])
+
+	BSRightRatio += ratio(testPredict[i][0]-Raw_dataset_test[i+look_back][0],Raw_dataset_test[i+look_back+1][0]-Raw_dataset_test[i+look_back][0])
+	DifRightRatio += abs((testPredict[i][0]-Raw_dataset_test[i+look_back][0])/Raw_dataset_test[i+look_back][0])
 	##如果開盤價小於預測買股票  大於則賣
 	##buy
 	if(difference < 0):
@@ -141,11 +144,14 @@ for i in range(len(testPredict)):
 			Total += 1000*Raw_dataset_test[i+look_back][0]
 			sum -= 1
 
-print(testPredict[1][0])
-print(Raw_dataset_test[1][0])
+print(testPredict)
+print(Raw_dataset_test)
 
-RightRatio /= len(testPredict)
-print("\nThis is Right Ratio: ", round(RightRatio,2))
+BSRightRatio /= len(testPredict)
+DifRightRatio /= len(testPredict)
+DifRightRatio = 1 - DifRightRatio
+print("\nThis is Right Ratio: ", round(BSRightRatio,2))
+print("This is Different Right Ratio: ", round(DifRightRatio,3))
 
 if(i == len(testPredict)-1):
 	if(sum > 0):
